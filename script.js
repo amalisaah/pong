@@ -13,7 +13,8 @@ let leftPaddle = {
     x: 10,
     y: canvas.height / 2 - PADDLE_HEIGHT / 2,
     width: PADDLE_WIDTH,
-    height: PADDLE_HEIGHT
+    height: PADDLE_HEIGHT,
+    velocity: 0
 };
 
 let rightPaddle = {
@@ -37,10 +38,35 @@ let score = {
 };
 
 let gameOver = false;
+let keyboardControl = {
+    up: false,
+    down: false
+};
+
+// Keyboard movement listeners
+window.addEventListener('keydown', function(e) {
+    if (gameOver) return;
+    if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
+        keyboardControl.up = true;
+    }
+    if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") {
+        keyboardControl.down = true;
+    }
+});
+
+window.addEventListener('keyup', function(e) {
+    if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
+        keyboardControl.up = false;
+    }
+    if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") {
+        keyboardControl.down = false;
+    }
+});
 
 // Update paddle position based on mouse
 canvas.addEventListener('mousemove', function (evt) {
     if (gameOver) return;
+    if (keyboardControl.up || keyboardControl.down) return; // ignore mouse if keyboard in use
     const rect = canvas.getBoundingClientRect();
     const mouseY = evt.clientY - rect.top;
     leftPaddle.y = mouseY - leftPaddle.height / 2;
@@ -92,6 +118,18 @@ function draw() {
 
 function update() {
     if (gameOver) return;
+
+    // Keyboard paddle move (priority over mouse)
+    if (keyboardControl.up) {
+        leftPaddle.y -= PADDLE_SPEED;
+    }
+    if (keyboardControl.down) {
+        leftPaddle.y += PADDLE_SPEED;
+    }
+    // Clamp paddle within canvas
+    if (keyboardControl.up || keyboardControl.down) {
+        leftPaddle.y = Math.max(Math.min(leftPaddle.y, canvas.height - leftPaddle.height), 0);
+    }
 
     // Ball movement
     ball.x += ball.speedX;
