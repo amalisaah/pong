@@ -7,7 +7,7 @@ const BALL_SIZE = 12;
 const PADDLE_SPEED = 5;
 const AI_SPEED = 3;
 const BALL_SPEED = 5;
-const WIN_SCORE = 5; // Added for win condition
+const WIN_SCORE = 15; // Added for win condition
 
 let leftPaddle = {
     x: 10,
