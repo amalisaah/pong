@@ -7,6 +7,7 @@ const BALL_SIZE = 12;
 const PADDLE_SPEED = 5;
 const AI_SPEED = 3;
 const BALL_SPEED = 5;
+const WIN_SCORE = 5; // Added for win condition
 
 let leftPaddle = {
     x: 10,
@@ -35,8 +36,11 @@ let score = {
     right: 0
 };
 
+let gameOver = false;
+
 // Update paddle position based on mouse
 canvas.addEventListener('mousemove', function (evt) {
+    if (gameOver) return;
     const rect = canvas.getBoundingClientRect();
     const mouseY = evt.clientY - rect.top;
     leftPaddle.y = mouseY - leftPaddle.height / 2;
@@ -87,6 +91,8 @@ function draw() {
 }
 
 function update() {
+    if (gameOver) return;
+
     // Ball movement
     ball.x += ball.speedX;
     ball.y += ball.speedY;
@@ -125,11 +131,13 @@ function update() {
     if (ball.x < 0) {
         score.right++;
         updateScore();
+        checkWin();
         resetBall();
     }
     if (ball.x + ball.size > canvas.width) {
         score.left++;
         updateScore();
+        checkWin();
         resetBall();
     }
 
@@ -147,6 +155,22 @@ function update() {
 function updateScore() {
     document.getElementById('score-left').textContent = score.left;
     document.getElementById('score-right').textContent = score.right;
+}
+
+function checkWin() {
+    if (score.left >= WIN_SCORE) {
+        gameOver = true;
+        setTimeout(() => {
+            alert("You win!");
+            location.reload();
+        }, 100);
+    } else if (score.right >= WIN_SCORE) {
+        gameOver = true;
+        setTimeout(() => {
+            alert("You lose!");
+            location.reload();
+        }, 100);
+    }
 }
 
 function gameLoop() {
